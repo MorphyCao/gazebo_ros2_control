@@ -1,0 +1,21 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 1000  # Hz
+
+    gripper_controller:
+      # type: forward_command_controller/ForwardCommandController
+      type: position_controllers/JointGroupPositionController
+      # type: joint_trajectory_controller/JointTrajectoryController
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+gripper_controller:
+  ros__parameters:
+    joints:
+      - robotiq_85_left_knuckle_joint
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
