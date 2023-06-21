@@ -266,3 +266,13 @@ ros2 launch rrbot_moveit_demo_nodes rrbot_demo.launch.py
 ```
 
 ![](img/moveit2.gif)
+
+```bash
+ros2 launch gazebo_ros2_control_demos gripper_effort_mimic_joint_example.launch.py 
+ros2 topic pub /gripper_controller/commands std_msgs/msg/Float64MultiArray "data:
+- 0.1"
+
+ros2 topic pub /base_controller/commands std_msgs/msg/Float64MultiArray "data:
+- 1"
+```
+

@@ -69,6 +69,12 @@ def generate_launch_description():
         output='screen'
     )
 
+    load_base_controller = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+             'base_controller'],
+        output='screen'
+    )
+
     return LaunchDescription([
         RegisterEventHandler(
           event_handler=OnProcessExit(

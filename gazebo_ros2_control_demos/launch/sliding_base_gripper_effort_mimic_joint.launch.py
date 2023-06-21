@@ -21,17 +21,23 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, FindExecutable, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
-import os
-import xacro
-from ament_index_python.packages import get_package_share_directory
 
 
 def generate_launch_description():
 
-    doc = xacro.parse(open(os.path.join(get_package_share_directory('robotiq_85_description'), 'urdf', 'robotiq_85_gripper_ros2.urdf.xacro')))
-    xacro.process_doc(doc)
-    robot_description_config = doc.toxml()
-    robot_description = {'robot_description': robot_description_config}
+    robot_description_content = Command(
+        [
+            PathJoinSubstitution([FindExecutable(name='xacro')]),
+            ' ',
+            PathJoinSubstitution(
+                [FindPackageShare(
+                    'gazebo_ros2_control_demos'),
+                    'urdf',
+                    'gripper_effort_mimic_joint_sliding_base.xacro.urdf']
+            ),
+        ]
+    )
+    robot_description = {'robot_description': robot_description_content}
 
     node_robot_state_publisher = Node(
         package='robot_state_publisher',
@@ -51,16 +57,22 @@ def generate_launch_description():
                                    '-entity', 'gripper'],
                         output='screen')
 
-    load_joint_state_controller = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
+    load_joint_state_controller = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+             'joint_state_broadcaster'],
+        output='screen'
     )
-    
-    load_gripper_controller = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["gripper_controller", "-c", "/controller_manager"],
+
+    load_gripper_controller = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+             'gripper_controller'],
+        output='screen'
+    )
+
+    load_base_controller = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+             'base_controller'],
+        output='screen'
     )
 
     return LaunchDescription([
@@ -73,7 +85,7 @@ def generate_launch_description():
         RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=load_joint_state_controller,
-                on_exit=[load_gripper_controller],
+                on_exit=[load_gripper_controller, load_base_controller],
             )
         ),
         gazebo,

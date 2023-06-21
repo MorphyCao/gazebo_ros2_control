@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <robot name="gripper">
   <link name="world"/>
-  <!-- <link name="gripper_root_link">
+  <link name="gripper_root_link">
       <visual>
           <origin xyz="0 0 1" rpy="0 0 0"/>
           <geometry>
@@ -21,20 +21,21 @@
                     iyx = "0.000000" iyy = "1000" iyz = "0.000000"
                     izx = "0.000000" izy = "0.000000" izz = "1000" />
       </inertial>
-  </link> -->
+  </link>
   <joint name="world_fixed" type="fixed">
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <parent link="world"/>
-      <child link="base"/>
+      <child link="gripper_root_link"/>
   </joint>
-  <!-- <joint name="base_prismatic" type="prismatic">
+
+  <joint name="base_prismatic" type="prismatic">
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <parent link="gripper_root_link"/>
     <child link="base"/>
     <axis xyz="0 0 1"/>
     <limit effort="1000.0" lower="0" upper="2" velocity="10"/>
     <dynamics damping="50" friction="5"/>
-  </joint> -->
+  </joint>
 
   <link name="base">
     <visual>
@@ -46,11 +47,18 @@
         <color rgba="0.4 0.18 0.57 1.0" />
       </material>
     </visual>
+    <collision>
+      <geometry>
+        <box size="1 1 0.5"/>
+      </geometry>
+      <origin xyz="0 0 0.25"/>
+    </collision>
     <inertial>
       <mass value="50"/>
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
     </inertial>
   </link>
+
   <link name="finger_right">
     <collision>
       <origin xyz="0.5 -0.05 0" rpy="0 0 0"/>
@@ -131,19 +139,19 @@
       <state_interface name="velocity"/>
       <state_interface name="effort"/>
     </joint>
-    <!-- <joint name="base_prismatic">
+    <joint name="base_prismatic">
       <command_interface name="position"/>
       <state_interface name="position">
         <param name="initial_value">0.15</param>
       </state_interface>
       <state_interface name="velocity"/>
       <state_interface name="effort"/>
-    </joint> -->
+    </joint>
   </ros2_control>
 
   <gazebo>
     <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
-      <parameters>$(find gazebo_ros2_control_demos)/config/gripper_effort_controller.yaml</parameters>
+      <parameters>$(find gazebo_ros2_control_demos)/config/gripper_with_base_controller.yaml</parameters>
     </plugin>
   </gazebo>
 </robot>
